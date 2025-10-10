@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #Task 1.1 - Reading waveform and plotting normalized amplitude vs time
 
-sample_rate, data = wavfile.read("speech_telephony_8k.wav")
+sample_rate, data = wavfile.read("DSP_Assignment_1_Q1.wav")
 
 print("Sample rate:", sample_rate)
 print("Data shape:", data.shape)
