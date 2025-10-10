@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #Task 1.1 - Reading waveform and plotting normalized amplitude vs time
 
-sample_rate, data = wavfile.read("DSP_Assigment_1_Q1.wav")
+sample_rate, data = wavfile.read("speech_telephony_8k.wav")
 
 print("Sample rate:", sample_rate)
 print("Data shape:", data.shape)
@@ -58,8 +58,8 @@ plt.show()
 
 
 plt.plot (freq, fd_db)
-plt.axvline(x=80, color='red', linestyle='--', linewidth=0.8)
-plt.axvline(x=8000, color='red', linestyle='--', linewidth=0.8)
+plt.axvline(x=2000, color='red', linestyle='--', linewidth=0.8)
+# plt.axvline(x=8000, color='red', linestyle='--', linewidth=0.8)
 plt.xscale('log')
 plt.ylabel('Magnitude (dB)')
 plt.xlabel('Frequency (Hz)')
