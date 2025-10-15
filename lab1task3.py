@@ -108,7 +108,7 @@ def detect_digit_in_segment(seg, sr):
     return None
 
 if __name__ == "__main__":
-    wav_path = "3.wav"  # <-- set your file
+    wav_path = "2.wav"  # <-- set your file
     sr, data = wavfile.read(wav_path)
     x = to_mono_float(data)
 

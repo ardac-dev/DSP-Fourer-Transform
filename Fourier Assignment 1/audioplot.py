@@ -4,24 +4,19 @@ import matplotlib.pyplot as plt
 
 #Task 1.1 - Reading waveform and plotting normalized amplitude vs time
 
-sample_rate, data = wavfile.read("DSP_Assigment_1_Q1.wav")
+sample_rate, data = wavfile.read("original_speech.wav")
 
-print("Sample rate:", sample_rate)
-print("Data shape:", data.shape)
-print("Data type:", data.dtype)
+#normalizing the signal to be in between -1 and 1 range
+td_normalized = data.astype(np.float32) / np.iinfo(data.dtype).max
 
-#if data.ndim > 1: # if its over one its sterio 
-    #data = data[:, 0] # if its sterio then discarding right channel and only looking at the left channel
-    
-td_normalized = data.astype(np.float32) / 32768.0 #normalizing the signal to be in between -1 and 1 range
-
+# creating time axis
 num_samples = len(td_normalized)
 t = np.arange(num_samples) / sample_rate #creating a time array for each sample
 duration = num_samples / sample_rate # finding the total duration of the recording
 
-#plotting
+#plotting normalised amplitude vs time
 plt.figure(figsize=(10,3))
-plt.plot(t, td_normalized, linewidth=0.8) # x-axis = (t) time, y-axis = normalized amplitude
+plt.plot(t, td_normalized, linewidth=0.8)
 plt.xlabel("Time (s)")
 plt.ylabel("Normalised amplitude")
 plt.title("Speech waveform (time domain)")
@@ -36,11 +31,9 @@ plt.show()
 fd_mag_raw = np.fft.fft(td_normalized)
 freq_raw = np.fft.fftfreq(num_samples, 1/sample_rate)
 pos_mask = freq_raw >= 0
-num_freqs = len(pos_mask)
+# num_freqs = len(pos_mask)
 fd_db = 20 * np.log10(2/num_samples*np.abs(fd_mag_raw))[pos_mask]
 freq = freq_raw[pos_mask]
-
-
 
 plt.plot (freq, fd_db)
 plt.xscale('log')
@@ -78,7 +71,3 @@ plt.title('Speech waveform (frequency domain)')
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
-
-
-
-
