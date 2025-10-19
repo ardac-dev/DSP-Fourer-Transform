@@ -28,7 +28,6 @@ def button_press_segment_detector(x, start_threshold = 0.8, sampling_length = 40
                     start = i
                     end = i + sampling_length
                     segments.append((start, end))
-    print (len(segments))
     return segments
 
 #this function analyses each detected button press segment using FFT, 
@@ -66,6 +65,7 @@ def detect_which_button_is_pressed(segments, sample_rate, x):
     return digits
 
 if __name__ == "__main__":
+
     sample_rate, data = wavfile.read("2.wav")
     td_normalized = (data.astype(np.float32)) / np.max(data)
     
@@ -76,14 +76,28 @@ if __name__ == "__main__":
 
     segments = button_press_segment_detector(td_normalized)
     digits = detect_which_button_is_pressed(segments, sample_rate, td_normalized)
-    print(digits)
-    print(button_press_segment_detector(td_normalized))
+
+    print("The number in 2.wav is", ''.join(digits))
+
+    sample_rate, data = wavfile.read("3.wav")
+    td_normalized = (data.astype(np.float32)) / np.max(data)
+    
+    num_samples = len(td_normalized)
+
+    t = np.arange(num_samples) / sample_rate #creating a time array for each sample
+    duration = num_samples / sample_rate # finding the total duration of the recording
+
+    segments = button_press_segment_detector(td_normalized)
+    digits = detect_which_button_is_pressed(segments, sample_rate, td_normalized)
+    print("The number in 3.wav is", ''.join(digits))
+
+    #print(button_press_segment_detector(td_normalized))
     #print(td_normalized[13000])
 
     num_samples = len(td_normalized)
     t = np.arange(num_samples) / sample_rate #creating a time array for each sample
     duration = num_samples / sample_rate # finding the total duration of the recording
-
+    
     #plotting normalised amplitude vs time
     plt.figure(figsize=(10,3))
     plt.plot(t, abs(td_normalized), linewidth=0.8)

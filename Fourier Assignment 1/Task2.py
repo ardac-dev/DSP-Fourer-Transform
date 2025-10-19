@@ -6,7 +6,7 @@ sr, data = wavfile.read("original_speech.wav")
 x = data.astype(np.float32) / np.iinfo(data.dtype).max
 
 # 2) Cutoff and target sampling rate
-target_sr = 8000 # telecominication voice standard 8kHz (8000 samples per second) human voice approx 300-3400 Hz Nyquis criteria: 3400*2=6800 to be safe 8000Hz
+target_sr = 8000 # telecommunication voice standard 8kHz (8000 samples per second) human voice approx 300-3400 Hz Nyquis criteria: 3400*2=6800 to be safe 8000Hz
 cutoff_hz  = 3400.0
 
 X = np.fft.rfft(x)
