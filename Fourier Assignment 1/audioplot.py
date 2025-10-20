@@ -29,9 +29,9 @@ plt.show()
 #Task 1.2 - Plotting magnitude (dB) vs Frequency (decades)
 
 fd_mag_raw = np.fft.fft(td_normalized)
-freq_raw = np.fft.fftfreq(num_samples, 1/sample_rate)
+k = np.arange(num_samples)
+freq_raw = np.where(k < num_samples/2, k * sample_rate / num_samples, (k - num_samples) * sample_rate / num_samples)
 pos_mask = freq_raw >= 0
-# num_freqs = len(pos_mask)
 fd_db = 20 * np.log10(2/num_samples*np.abs(fd_mag_raw))[pos_mask]
 freq = freq_raw[pos_mask]
 

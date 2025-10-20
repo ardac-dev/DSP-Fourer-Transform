@@ -38,7 +38,9 @@ def detect_which_button_is_pressed(segments, sample_rate, x):
     for (start, end) in segments:
         segment = x[start:end]
         X = np.fft.fft(segment)
-        freqs = np.fft.fftfreq(len(segment), 1/sample_rate)
+        num_samples = len(segment)
+        k = np.arange(num_samples)
+        freqs = np.where(k < num_samples/2, k * sample_rate / num_samples, (k - num_samples) * sample_rate / num_samples)
         magnitudes = np.abs(X)
         
         #only keeping positive magnitudes and frequencies
@@ -68,75 +70,14 @@ if __name__ == "__main__":
 
     sample_rate, data = wavfile.read("2.wav")
     td_normalized = (data.astype(np.float32)) / np.max(data)
-    
-    num_samples = len(td_normalized)
-
-    t = np.arange(num_samples) / sample_rate #creating a time array for each sample
-    duration = num_samples / sample_rate # finding the total duration of the recording
 
     segments = button_press_segment_detector(td_normalized)
     digits = detect_which_button_is_pressed(segments, sample_rate, td_normalized)
-
     print("The number in 2.wav is", ''.join(digits))
 
     sample_rate, data = wavfile.read("3.wav")
     td_normalized = (data.astype(np.float32)) / np.max(data)
-    
-    num_samples = len(td_normalized)
-
-    t = np.arange(num_samples) / sample_rate #creating a time array for each sample
-    duration = num_samples / sample_rate # finding the total duration of the recording
 
     segments = button_press_segment_detector(td_normalized)
     digits = detect_which_button_is_pressed(segments, sample_rate, td_normalized)
     print("The number in 3.wav is", ''.join(digits))
-
-    #print(button_press_segment_detector(td_normalized))
-    #print(td_normalized[13000])
-
-    num_samples = len(td_normalized)
-    t = np.arange(num_samples) / sample_rate #creating a time array for each sample
-    duration = num_samples / sample_rate # finding the total duration of the recording
-    
-    #plotting normalised amplitude vs time
-    plt.figure(figsize=(10,3))
-    plt.plot(t, abs(td_normalized), linewidth=0.8)
-    plt.xlabel("Time (s)")
-    plt.ylabel("Normalised amplitude")
-    plt.title("Speech waveform (time domain)")
-    plt.xlim(0, duration)
-    plt.ylim(-1.05, 1.05)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.show()
-
-
-
-'''
-def button_press_segment_detector(x, threshold=0.3, end_treshold = 830):
-    env = np.abs(x)
-    N = len(env)
-    i = 0
-    segments = []
-    
-    while i < N:
-        while i < N and env[i]<threshold:
-            i+=1
-        if i >= N:
-            break
-        start = i
-        
-        end_check = 0
-        while i<N:
-            val = round(env[i], 1)
-            if val in [0.0,0.1]:
-                end_check += 1
-            else:
-                end_check = 0
-            if end_check >= end_treshold:
-                break
-            i+=1
-        end = i
-        segments.append((start,end))
-    return segments
-    '''
