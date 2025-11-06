@@ -17,24 +17,35 @@ def design_fir_ifft(fs, stopbands_hz):
     L = 5001  # filter length (fixed, odd length gives linear phase)
 
     # 1. Construct ideal frequency response H[k]
-    H = np.ones(L, dtype=float)
+    X = np.ones(L, dtype=float)
     freqs = np.fft.fftfreq(L, d=1.0/fs)
 
     # remove requested stopbands
     for f1, f2 in stopbands_hz:
-        H[(np.abs(freqs) >= f1) & (np.abs(freqs) <= f2)] = 0.0
+        X[(np.abs(freqs) >= f1) & (np.abs(freqs) <= f2)] = 0.0
 
     # also explicitly remove DC (edge case mentioned in assignment)
-    H[np.isclose(freqs, 0.0, atol=1e-12)] = 0.0
+    X[np.isclose(freqs, 0.0, atol=1e-12)] = 0.0
 
     # 2. IFFT to obtain impulse response
-    h = np.fft.ifft(H).real
+    x = np.fft.ifft(X).real
+    t = np.arange(L)/fs
+
+    h = np.zeros(L)
+    h[0:L//2 + 1] = x[L//2 : L]
+    h[L//2 + 1 :] = x[0 : L//2]
+
+    plt.figure()
+    plt.plot(t, h)
+    plt.show()
 
     # 3. Shift to make filter causal (center → right)
-    h = np.fft.ifftshift(h)
+    #h = np.fft.ifftshift(h)
+
+
 
     # 4. Apply window to reduce ringing (allowed by assignment)
-    #h = h * np.hamming(L)
+    h = h * np.hamming(L)
 
     return h
 
@@ -47,6 +58,7 @@ Nresp = 16384
 H = np.fft.rfft(coeffs, n=Nresp)
 f = np.fft.rfftfreq(Nresp, d=1.0/fs)
 mag = np.abs(H)
+
 
 plt.figure()
 plt.plot(f, mag)

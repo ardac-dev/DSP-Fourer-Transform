@@ -8,15 +8,12 @@ print(df.shape)
 pos_col_num = 7  # 0-based index; adjust if needed
 sample = pd.to_numeric(df.iloc[:, pos_col_num], errors='coerce').to_numpy()
 
-# Remove DC offset
-sample_norm = sample - np.mean(sample)
-
 fs = 500.0
-N  = len(sample_norm)
+N  = len(sample)
 t  = np.arange(N)/fs
 
 # --- FFT ---
-X = np.fft.fft(sample_norm)
+X = np.fft.fft(sample)
 k = np.arange(N)
 freq = np.where(k < N/2, k*fs/N, (k - N)*fs/N)
 
@@ -31,6 +28,9 @@ Xf[(np.abs(freq) >= 45) & (np.abs(freq) <= 55)] = 0.0
 
 # (3) Remove very low frequency drift (< 0.8 Hz)  <-- change to 0.4 if desired
 Xf[np.abs(freq) < 0.8] = 0.0
+
+#(4)
+Xf[np.abs(freq) > 100] = 0.0
 
 # --- Inverse FFT back to time domain ---
 y = np.fft.ifft(Xf).real
@@ -55,7 +55,7 @@ plt.show()
 
 # --- Time domain comparison ---
 plt.figure()
-plt.plot(t, sample_norm, label='Original', alpha=0.6)
+plt.plot(t, sample, label='Original', alpha=0.6)
 plt.plot(t, y, label='Filtered', alpha=0.9)
 plt.xlabel('Time (s)')
 plt.ylabel('Amplitude')
