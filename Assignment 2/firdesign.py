@@ -24,9 +24,6 @@ def design_fir_ifft(fs, stopbands_hz):
     for f1, f2 in stopbands_hz:
         X[(np.abs(freqs) >= f1) & (np.abs(freqs) <= f2)] = 0.0
 
-    # also explicitly remove DC (edge case mentioned in assignment)
-    X[np.isclose(freqs, 0.0, atol=1e-12)] = 0.0
-
     # 2. IFFT to obtain impulse response
     x = np.fft.ifft(X).real
     t = np.arange(L)/fs
@@ -49,15 +46,18 @@ def design_fir_ifft(fs, stopbands_hz):
 
     return h
 
+'''
 fs = 500.0
 stopbands = [(0, 0.7), (40, fs/2)]
 coeffs = design_fir_ifft(fs, stopbands)
 
+
 # Frequency response
-Nresp = 16384
+Nresp = 5000
 H = np.fft.rfft(coeffs, n=Nresp)
 f = np.fft.rfftfreq(Nresp, d=1.0/fs)
 mag = np.abs(H)
+
 
 
 plt.figure()
@@ -72,3 +72,5 @@ plt.axvline(0.7, linestyle="--", linewidth=1)
 plt.axvline(40,  linestyle="--", linewidth=1)
 plt.tight_layout()
 plt.show()
+
+'''
