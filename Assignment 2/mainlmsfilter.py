@@ -23,6 +23,7 @@ my_filter = FIRfilter(design_fir_ifft(fs, [[0,fs/2]]))
 for i in range(num_samples):
 
     fifty_Hz = np.sin(2.0 * np.pi * 50 * i /fs) 
+    DC_Hz = np.sin(2.0 * np.pi *0.5 * i /fs) 
 
     outputs[i] = my_filter.doFilterAdaptive(sample[i], fifty_Hz + noise[i], 0.0001)
 
