@@ -32,9 +32,11 @@ def design_fir_ifft(fs, stopbands_hz):
     h[0:L//2 + 1] = x[L//2 : L]
     h[L//2 + 1 :] = x[0 : L//2]
 
+    '''
     plt.figure()
     plt.plot(t, h)
     plt.show()
+    '''
 
     # 3. Shift to make filter causal (center → right)
     #h = np.fft.ifftshift(h)
