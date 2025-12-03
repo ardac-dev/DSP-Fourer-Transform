@@ -188,7 +188,7 @@ line, = ax.plot([], [], lw=1.5)
 ax.set_title("Band-pass (70–650 Hz) + 50 Hz notch")
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Filtered amplitude (arb. units)")
-ax.set_ylim(-2, 2)
+ax.set_ylim(-0.5, 0.5)
 ax.set_xlim(0, 2)
 
 def update_plot(frame):
