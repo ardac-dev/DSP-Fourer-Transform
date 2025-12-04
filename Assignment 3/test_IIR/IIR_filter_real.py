@@ -7,6 +7,14 @@ import matplotlib.animation as animation
 from collections import deque
 import numpy as np
 
+# Peak detection buffers
+PEAK_THRESHOLD = 0.03      # volts
+NEIGHBORHOOD = 3           # 3 samples each side
+MAX_PEAK_HISTORY = 20      # store last few peaks
+
+signal_buffer = deque([0.0]*100, maxlen=100)  # last 100 filtered samples
+peak_times = deque([], maxlen=MAX_PEAK_HISTORY)
+LAST_VELOCITY_PRINT = 0.0
 FS = 1000.0   # sampling rate (Hz)
 HPF_CUTOFF = 70 # HPF cutoff freq (Hz)
 LPF_CUTOFF = 300 # LPF cutoff freq (Hz)

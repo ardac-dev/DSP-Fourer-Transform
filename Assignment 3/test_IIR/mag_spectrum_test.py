@@ -12,7 +12,7 @@ FS = 1000.0                 # sampling frequency (Hz)
 DURATION = 5.0              # seconds
 N_SAMPLES = int(FS * DURATION)
 
-HPF_CUTOFF = 70            # Hz
+HPF_CUTOFF = 40            # Hz
 LPF_CUTOFF = 300.0          # Hz
 
 IGNORE_LOW_FREQ = 10.0      # Hz threshold to ignore

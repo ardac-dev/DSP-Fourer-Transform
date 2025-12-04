@@ -2,26 +2,20 @@ import time
 from lpf_IIR import IIRlpf
 from hpf_IIR import IIRhpf
 import pyfirmata2
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from collections import deque
 import numpy as np
+import tkinter as tk
 
-# ============================================================
-# PEAK DETECTION SETTINGS
-# ============================================================
-PEAK_THRESHOLD = 0.015
-NEIGHBORHOOD = 3
+
+PEAK_THRESHOLD = 0.02
+NEIGHBORHOOD = 2
 MAX_PEAK_HISTORY = 20
 
 signal_buffer = deque([0.0]*100, maxlen=100)
 peak_times = deque([], maxlen=MAX_PEAK_HISTORY)
+current_velocity_kmh = 0.0
 
-current_velocity_kmh = 0.0   # <- displayed in plot
 
-# ============================================================
-# FILTER SETTINGS
-# ============================================================
 FS = 1000.0
 HPF_CUTOFF = 70
 LPF_CUTOFF = 300
@@ -34,9 +28,7 @@ for sec in hpf_sections:
 for sec in lpf_sections:
     sec.calc_coeffs()
 
-# ============================================================
-# FILTER PIPELINE
-# ============================================================
+
 def bandpass_filter_sample(x):
     y = x
     for sec in hpf_sections:
@@ -45,9 +37,7 @@ def bandpass_filter_sample(x):
         y = sec.dofilter(y)
     return y
 
-# ============================================================
-# PEAK DETECTION
-# ============================================================
+
 def detect_peak(sample, current_time):
     signal_buffer.append(sample)
 
@@ -93,20 +83,36 @@ def compute_velocity_from_peaks():
 
     return fd, v_kmh
 
-# ============================================================
-# ARDUINO SETUP
-# ============================================================
 board = pyfirmata2.Arduino(pyfirmata2.Arduino.AUTODETECT)
 board.samplingOn(1)
 
-NUM_SAMPLES = 5000
-filtered_values = deque([0.0]*NUM_SAMPLES, maxlen=NUM_SAMPLES)
-times = deque([0.0]*NUM_SAMPLES, maxlen=NUM_SAMPLES)
 start_time = time.time()
 
-# ============================================================
-# CALLBACK
-# ============================================================
+
+root = tk.Tk()
+root.title("Doppler Speed Display")
+
+# make the window large and simple
+root.geometry("800x400")   # adjust as needed
+root.configure(bg="black")
+
+velocity_label = tk.Label(
+    root,
+    text="Velocity: 0.00 km/h",
+    font=("Arial", 80, "bold"),
+    fg="lime",
+    bg="black"
+)
+velocity_label.pack(expand=True)
+
+def update_gui():
+    """Update Tkinter label. Called repeatedly."""
+    velocity_label.config(text=f"Velocity: {current_velocity_kmh:5.2f} km/h")
+    root.after(50, update_gui)  # update at 20 FPS
+
+root.after(50, update_gui)
+
+
 def a0_callback(data):
     global current_velocity_kmh
 
@@ -117,13 +123,9 @@ def a0_callback(data):
     t = time.time() - start_time
 
     y = bandpass_filter_sample(voltage)
-
-    filtered_values.append(y)
-    times.append(t)
-
     detect_peak(y, t)
 
-    # Real-time velocity every callback
+    # If no peaks recently → reset to 0
     if time_since_last_peak(t) > 0.1:
         current_velocity_kmh = 0.0
     else:
@@ -131,54 +133,15 @@ def a0_callback(data):
         if fd is not None:
             current_velocity_kmh = v_kmh
 
-# Start streaming
 a0 = board.get_pin('a:0:i')
 a0.register_callback(a0_callback)
 a0.enable_reporting()
 
-# ============================================================
-# PLOT
-# ============================================================
-plt.style.use('ggplot')
-fig, ax = plt.subplots()
-line, = ax.plot([], [], lw=1.2)
 
-ax.set_title("Radar Filtered Output (Real-Time)")
-ax.set_xlabel("Time (s)")
-ax.set_ylabel("Amplitude (V)")
-ax.set_ylim(-0.1, 0.1)
-ax.set_xlim(0, 5)
-
-# Velocity display text
-velocity_text = ax.text(
-    0.02, 0.92, "Velocity: 0.00 km/h",
-    transform=ax.transAxes,
-    fontsize=14,
-    color='black',
-    bbox=dict(facecolor='white', alpha=0.7)
-)
-
-def update_plot(frame):
-    if len(times) > 1:
-        ax.set_xlim(times[0], times[-1])
-        line.set_data(times, filtered_values)
-
-    # Update velocity text
-    velocity_text.set_text(f"Velocity: {current_velocity_kmh:5.2f} km/h")
-
-    return line, velocity_text
-
-ani = animation.FuncAnimation(fig, update_plot, interval=150, blit=True)
-
-# ============================================================
-# RUN
-# ============================================================
 try:
-    plt.show()
+    root.mainloop()
 except KeyboardInterrupt:
     pass
 
 print("Exiting…")
 board.exit()
-
-
