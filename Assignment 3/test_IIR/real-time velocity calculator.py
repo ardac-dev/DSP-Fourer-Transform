@@ -10,7 +10,7 @@ import numpy as np
 # ============================================================
 # PEAK DETECTION SETTINGS
 # ============================================================
-PEAK_THRESHOLD = 0.05
+PEAK_THRESHOLD = 0.15
 NEIGHBORHOOD = 2
 MAX_PEAK_HISTORY = 20
 
@@ -23,7 +23,7 @@ current_velocity_kmh = 0.0   # <- displayed in plot
 # FILTER SETTINGS
 # ============================================================
 FS = 1000.0
-HPF_CUTOFF = 90
+HPF_CUTOFF = 70
 LPF_CUTOFF = 300
 
 hpf_sections = [IIRhpf(HPF_CUTOFF, FS) for _ in range(3)]
@@ -108,7 +108,7 @@ def a0_callback(data):
 
     if data is None:
         return
-
+    print (data)
     voltage = data * 5.0
     t = time.time() - start_time
 
