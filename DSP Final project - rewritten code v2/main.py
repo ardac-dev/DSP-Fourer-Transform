@@ -2,6 +2,7 @@ import pyfirmata2
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
+import numpy as np
 
 from Radar import RadarDSP
 from LED import MotionLedController
@@ -15,8 +16,8 @@ PLOT_WINDOW_S = 5.0 # seconds of data shown in plot
 
 # envelope / motion detection for LED
 ENV_ALPHA = 0.05 # envelope smoothing factor
-TH_HIGH = 0.25 # motion start threshold
-TH_LOW = 0.15 # motion end threshold
+TH_HIGH = 0.4 # motion start threshold
+TH_LOW = 0.2 # motion end threshold
 MIN_LED_TOGGLE_INTERVAL_SAMPLES = int(1.0 * FS)  # e.g. 1 second at 1 kHz
 
 FS_REPORT_INTERVAL_S = 1.0 #printing measured sampling rate every second
@@ -40,7 +41,7 @@ dsp = RadarDSP(
 # led controller
 motion_led = MotionLedController(
     led_pin=led_pin,
-    env_alpha=ENV_ALPHA,
+    #env_alpha=ENV_ALPHA,
     th_high=TH_HIGH,
     th_low=TH_LOW,
     min_toggle_interval_samples=MIN_LED_TOGGLE_INTERVAL_SAMPLES
@@ -119,6 +120,43 @@ try:
     plt.show()
 except KeyboardInterrupt:
     pass
+
+'''
+if len(dsp.raw_values) > 0 and len(dsp.filtered_values) > 0:
+    # convert deques to numpy arrays
+    raw = np.array(dsp.raw_values, dtype=float)
+    filt = np.array(dsp.filtered_values, dtype=float)
+
+    # remove DC component for better visualisation of spectrum
+    raw = raw - np.mean(raw)
+    filt = filt - np.mean(filt)
+
+    N = len(raw)
+    # one-sided frequency axis (0 .. Fs/2)
+    freqs = np.fft.rfftfreq(N, d=1.0 / FS)
+
+    # FFT magnitude
+    RawSpec = np.abs(np.fft.rfft(raw))
+    FiltSpec = np.abs(np.fft.rfft(filt))
+
+    plt.figure(figsize=(8, 4))
+    plt.semilogy(freqs, RawSpec, label="Raw signal")
+    plt.semilogy(freqs, FiltSpec, label="Filtered signal")
+    
+    # frequency range
+    plt.xlim(0, 500)
+
+    # magnitude range (10^-3 to max)
+    plt.ylim(1e-3, max(RawSpec) * 1.1)
+
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Magnitude")
+    plt.title("Spectrum of Raw vs Filtered Radar Signal")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+'''
 
 print("Exiting…")
 motion_led.turn_off()
