@@ -16,7 +16,7 @@ PLOT_WINDOW_S = 5.0 # seconds of data shown in plot
 
 # envelope / motion detection for LED
 ENV_ALPHA = 0.05 # envelope smoothing factor
-TH_HIGH = 0.4 # motion start threshold
+TH_HIGH = 0.75 # motion start threshold
 TH_LOW = 0.2 # motion end threshold
 MIN_LED_TOGGLE_INTERVAL_SAMPLES = int(1.0 * FS)  # e.g. 1 second at 1 kHz
 
@@ -96,14 +96,14 @@ fig, (ax_raw, ax_filt) = plt.subplots(2, 1, sharex=True, figsize=(8, 6))
 line_raw, = ax_raw.plot([], [], lw=1.0)
 ax_raw.set_title("Radar Raw Output (Real-Time)")
 ax_raw.set_ylabel("Amplitude (V)")
-ax_raw.set_ylim(0, 5)
+ax_raw.set_ylim(0.5, 4.5)
 
 # filtered signal line
 line_filt, = ax_filt.plot([], [], lw=1.2)
 ax_filt.set_title("Radar Filtered Output (Real-Time)")
 ax_filt.set_xlabel("Time (s)")
 ax_filt.set_ylabel("Amplitude (V)")
-ax_filt.set_ylim(-2, 3)
+ax_filt.set_ylim(-2, 2)
 ax_filt.set_xlim(0, PLOT_WINDOW_S)
 
 def update_plot(frame):
